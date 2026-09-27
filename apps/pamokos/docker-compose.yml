@@ -1,0 +1,27 @@
+services:
+  pamokos:
+    image: marchyus/pamokos:latest
+    container_name: pamokos
+    restart: unless-stopped
+    volumes:
+      # Mounts local ./db directory for schedule persitance
+      - ./db:/app/db
+    # traefik network
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.pamokos.rule=Host(`${MAIN_URL}`)"
+
+      # 'web' or 'websecure'
+      - "traefik.http.routers.pamokos.entrypoints=websecure"
+
+      # The unified app (FastAPI + React) runs on port 8000 internally
+      - "traefik.http.services.pamokos.loadbalancer.server.port=8000"
+
+# external Traefik network
+networks:
+  proxy:
+    external: true
+

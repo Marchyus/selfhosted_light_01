@@ -1,0 +1,24 @@
+services:
+  papra:
+    container_name: papra
+    image: ghcr.io/papra-hq/papra:latest
+    restart: unless-stopped
+    ports:
+      - "1221:1221"
+    environment:
+      - AUTH_SECRET=${AUTH_SECRET}
+    volumes:
+      - ./app-data:/app/app-data
+    user: "${UID}:${GID}"
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.papra.rule=Host(`${MAIN_URL}`)"
+      - "traefik.http.routers.papra.entrypoints=websecure"
+      - "traefik.http.services.papra.loadbalancer.server.port=1221"
+
+
+networks:
+  proxy:
+    external: true
